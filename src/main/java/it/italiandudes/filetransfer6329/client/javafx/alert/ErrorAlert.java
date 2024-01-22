@@ -9,7 +9,7 @@ import javafx.stage.Stage;
 @SuppressWarnings("unused")
 public final class ErrorAlert extends Alert {
 
-    //Constructors
+    // Constructors
     public ErrorAlert(String title, String header, String content){
         super(AlertType.ERROR);
         this.setResizable(true);

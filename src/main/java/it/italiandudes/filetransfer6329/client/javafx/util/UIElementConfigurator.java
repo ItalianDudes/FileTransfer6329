@@ -8,7 +8,6 @@ import java.text.ParsePosition;
 import java.util.function.UnaryOperator;
 
 public final class UIElementConfigurator {
-
     public static TextFormatter<Integer> configureNewIntegerTextFormatter() {
         NumberFormat format = NumberFormat.getIntegerInstance();
         UnaryOperator<TextFormatter.Change> filter = c -> {

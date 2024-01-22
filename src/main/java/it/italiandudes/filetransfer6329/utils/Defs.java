@@ -53,6 +53,8 @@ public final class Defs {
             public static final String IMAGE_LIGHT_MODE = IMAGE_DIR + "light_mode.png";
             public static final String IMAGE_TICK = IMAGE_DIR + "tick.png";
             public static final String IMAGE_CROSS = IMAGE_DIR + "cross.png";
+            public static final String IMAGE_ONLINE = IMAGE_DIR + "online.png";
+            public static final String IMAGE_OFFLINE = IMAGE_DIR + "offline.png";
         }
     }
 }

@@ -26,11 +26,11 @@ public final class ControllerSceneSettingsEditor {
     private static final Image TICK = new Image(Defs.Resources.getAsStream(Defs.Resources.Image.IMAGE_TICK));
     private static final Image CROSS = new Image(Defs.Resources.getAsStream(Defs.Resources.Image.IMAGE_CROSS));
 
-    //Graphic Elements
+    // Graphic Elements
     @FXML private ImageView imageViewEnableDarkMode;
     @FXML private ToggleButton toggleButtonEnableDarkMode;
 
-    //Initialize
+    // Initialize
     @FXML
     private void initialize() {
         Client.getStage().setResizable(true);

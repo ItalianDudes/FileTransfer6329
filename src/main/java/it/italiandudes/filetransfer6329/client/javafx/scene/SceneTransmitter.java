@@ -9,12 +9,12 @@ import javafx.scene.Scene;
 
 import java.io.IOException;
 
-public final class SceneSettingsEditor {
+public final class SceneTransmitter {
 
     // Scene Generator
     public static Scene getScene(){
         try {
-            Scene scene = new Scene(FXMLLoader.load(Defs.Resources.get(JFXDefs.Resources.FXML.FXML_SETTINGS_EDITOR)));
+            Scene scene = new Scene(FXMLLoader.load(Defs.Resources.get(JFXDefs.Resources.FXML.FXML_TRANSMITTER)));
             ThemeHandler.loadConfigTheme(scene);
             return scene;
         }catch (IOException e){

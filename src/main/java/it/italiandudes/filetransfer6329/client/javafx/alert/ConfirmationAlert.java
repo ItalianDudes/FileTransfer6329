@@ -12,10 +12,10 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 public final class ConfirmationAlert extends Alert {
 
-    //Attributes
+    // Attributes
     public final boolean result;
 
-    //Constructors
+    // Constructors
     public ConfirmationAlert(String title, String header, String content){
         super(AlertType.CONFIRMATION);
         this.setResizable(true);

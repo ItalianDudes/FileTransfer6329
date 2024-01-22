@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public final class SceneMainMenu {
 
-    //Scene Generator
+    // Scene Generator
     public static Scene getScene(){
         try {
             Scene scene = new Scene(FXMLLoader.load(Defs.Resources.get(JFXDefs.Resources.FXML.FXML_MAIN_MENU)));

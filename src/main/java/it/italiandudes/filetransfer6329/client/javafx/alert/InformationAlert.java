@@ -9,7 +9,7 @@ import javafx.stage.Stage;
 @SuppressWarnings("unused")
 public final class InformationAlert extends Alert {
 
-    //Constructors
+    // Constructors
     public InformationAlert(String title, String header, String content){
         super(AlertType.INFORMATION);
         this.setResizable(true);

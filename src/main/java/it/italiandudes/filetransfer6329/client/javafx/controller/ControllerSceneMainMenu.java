@@ -4,7 +4,9 @@ import it.italiandudes.filetransfer6329.client.javafx.Client;
 import it.italiandudes.filetransfer6329.client.javafx.alert.ConfirmationAlert;
 import it.italiandudes.filetransfer6329.client.javafx.alert.ErrorAlert;
 import it.italiandudes.filetransfer6329.client.javafx.alert.InformationAlert;
+import it.italiandudes.filetransfer6329.client.javafx.scene.SceneReceiver;
 import it.italiandudes.filetransfer6329.client.javafx.scene.SceneSettingsEditor;
+import it.italiandudes.filetransfer6329.client.javafx.scene.SceneTransmitter;
 import it.italiandudes.filetransfer6329.utils.Defs;
 import it.italiandudes.filetransfer6329.utils.Updater;
 import it.italiandudes.idl.common.Logger;
@@ -21,7 +23,7 @@ import java.io.IOException;
 
 public final class ControllerSceneMainMenu {
 
-    //Initialize
+    // Initialize
     @FXML
     private void initialize() {
         Client.getStage().setResizable(true);
@@ -132,7 +134,11 @@ public final class ControllerSceneMainMenu {
         Client.getStage().setScene(SceneSettingsEditor.getScene());
     }
     @FXML
-    private void openAsTransmitter() {}
+    private void openAsTransmitter() {
+        Client.getStage().setScene(SceneTransmitter.getScene());
+    }
     @FXML
-    private void openAsReceiver() {}
+    private void openAsReceiver() {
+        Client.getStage().setScene(SceneReceiver.getScene());
+    }
 }

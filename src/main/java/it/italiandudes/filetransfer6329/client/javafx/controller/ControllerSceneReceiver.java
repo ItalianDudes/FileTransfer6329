@@ -3,7 +3,7 @@ package it.italiandudes.filetransfer6329.client.javafx.controller;
 import it.italiandudes.filetransfer6329.client.javafx.Client;
 import javafx.fxml.FXML;
 
-public final class ControllerSceneLoading {
+public final class ControllerSceneReceiver {
 
     // Initialize
     @FXML
