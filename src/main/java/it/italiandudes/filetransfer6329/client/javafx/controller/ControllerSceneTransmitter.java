@@ -24,7 +24,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 public final class ControllerSceneTransmitter {
 
@@ -62,27 +65,50 @@ public final class ControllerSceneTransmitter {
     @FXML
     private void addFile() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Seleziona un File");
+        fileChooser.setTitle("Seleziona Uno o Piu' File");
         fileChooser.setInitialDirectory(new File(Defs.JAR_POSITION).getParentFile());
-        File filePath;
+        List<File> files;
         try {
-            filePath = fileChooser.showOpenDialog(Client.getStage().getScene().getWindow());
+            files = fileChooser.showOpenMultipleDialog(Client.getStage().getScene().getWindow());
         } catch (IllegalArgumentException e) {
             fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-            filePath = fileChooser.showOpenDialog(Client.getStage().getScene().getWindow());
+            files = fileChooser.showOpenMultipleDialog(Client.getStage().getScene().getWindow());
         }
-        if(filePath!=null) {
-            try {
-                tableViewFileList.getItems().add(new ServerElement(filePath));
-            } catch (FileNotFoundException e) {
-                new ErrorAlert("ERRORE", "Errore di Percorso", "Il percorso \"" + filePath.getAbsolutePath() + "\" non conduce a un file valido.");
+        if (files != null) {
+            HashSet<File> fileSet = new HashSet<>(files);
+            int total = fileSet.size();
+            int success = 0;
+            int fail = 0;
+            ArrayList<String> failPath = new ArrayList<>();
+            for (File file : fileSet) {
+                try {
+                    tableViewFileList.getItems().add(new ServerElement(file));
+                    success++;
+                } catch (FileNotFoundException e) {
+                    fail++;
+                    failPath.add(file.getAbsolutePath());
+                }
+            }
+            if (fail > 0) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Alcuni dei file forniti non esistono o non sono validi.").append('\n');
+                sb.append("File Forniti: ").append(total).append('\n');
+                sb.append("Successi: ").append(success).append('\n');
+                sb.append("Fallimenti: ").append(fail).append('\n');
+                for (String s : failPath) {
+                    sb.append(s).append('\n');
+                }
+                new ErrorAlert("ERRORE", "Errore di Inserimento", sb.toString());
             }
         }
     }
     @FXML
-    private void deleteFile() {}
-    @FXML
-    private void refreshList() {}
+    private void removeFile() {
+        ServerElement element = tableViewFileList.getSelectionModel().getSelectedItem();
+        if (element != null) {
+            tableViewFileList.getItems().remove(element);
+        }
+    }
     @FXML
     private void changeConnectionStatus() {
         buttonConnectionStatus.setDisable(true);

@@ -35,7 +35,6 @@
                 <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" />
                 <ColumnConstraints halignment="CENTER" hgrow="NEVER" />
                   <ColumnConstraints halignment="CENTER" hgrow="NEVER" />
-                  <ColumnConstraints halignment="CENTER" hgrow="NEVER" />
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints valignment="CENTER" vgrow="NEVER" />
@@ -65,23 +64,11 @@
                         <Font name="Lucida Sans Demibold" size="24.0" />
                      </font>
                   </Button>
-                  <Button focusTraversable="false" mnemonicParsing="false" onAction="#deleteFile" text="Elimina" GridPane.columnIndex="2">
+                  <Button focusTraversable="false" mnemonicParsing="false" onAction="#removeFile" text="Rimuovi File" GridPane.columnIndex="2">
                      <graphic>
                         <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../image/delete.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <font>
-                        <Font name="Lucida Sans Demibold" size="24.0" />
-                     </font>
-                  </Button>
-                  <Button focusTraversable="false" layoutX="1114.0" layoutY="11.0" mnemonicParsing="false" onAction="#refreshList" text="Aggiorna" GridPane.columnIndex="3">
-                     <graphic>
-                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../image/refresh.png" />
                            </image>
                         </ImageView>
                      </graphic>
