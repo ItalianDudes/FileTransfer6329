@@ -1,0 +1,55 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'java'
+}
+
+// Versioning
+def versionNumber = '0.1'
+def versionType = 'ALPHA' // RELEASE | BETA | ALPHA
+def versionMarker = versionType.charAt(0)
+
+group = 'it.italiandudes'
+version = versionNumber+versionMarker
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'lib'
+    }
+}
+
+dependencies {
+    compileOnly 'org.jetbrains:annotations:23.0.0'
+    implementation 'commons-io:commons-io:2.11.0'
+    implementation 'commons-codec:commons-codec:1.15'
+    implementation 'it.italiandudes:idl:1.0.5'
+    implementation 'org.json:json:20231013'
+}
+
+shadowJar {
+    manifest {
+        attributes "Main-Class" : "it.italiandudes.filetransfer6329.FileTransfer6329"
+        attributes "Title" : "FileTransfer6329"
+        attributes "Vendor" : "ItalianDudes"
+        attributes "Version" : archiveVersion.get()
+        attributes "Version-Number" : archiveVersion.get()
+        attributes "Version-Type" : versionType
+        attributes "Version-Marker" : versionMarker
+        attributes "Timestamp" : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+    }
+    archiveFileName = getRootDir().getName()+"-"+archiveVersion.get()+".jar"
+}
+
+tasks.register('buildJar') {
+    dependsOn shadowJar
+    group = "Build"
+    description = "Build and assemble FileTransfer6329"
+}
+
+tasks.register('runJar', Exec) {
+    dependsOn shadowJar
+    group = "Execution"
+    description = "Build, assemble and run FileTransfer6329"
+    standardInput = System.in
+    commandLine "java", "-jar", jar.archiveFile.get()
+}
