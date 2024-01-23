@@ -118,7 +118,7 @@ public final class ControllerSceneReceiver {
                                     try (FileOutputStream fileWriter = new FileOutputStream(finalFile)) {
                                         int bytesRead;
                                         while ((bytesRead = connection.getInputStream().read(buffer)) != -1) {
-                                            fileWriter.write(buffer);
+                                            fileWriter.write(buffer, 0, bytesRead);
                                             receivedBytes += bytesRead;
                                             RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.OK));
                                             if (receivedBytes == filesize) break;
