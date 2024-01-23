@@ -34,10 +34,8 @@ public class ClientHandler extends Thread {
                 int request = RawSerializer.receiveInt(connection.getInputStream());
                 SocketProtocol protocol = SocketProtocol.getRequestByInt(request);
                 if (protocol == null) { // Invalid Request
-                    Logger.log("INVALID REQUEST");
                     RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.INVALID_MESSAGE));
                 } else if (protocol.getUsability() == ProtocolUsability.TRANSMITTER_ONLY) { // The request is transmitter-only
-                    Logger.log("TRANSMITTER ONLY");
                     RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.PROTOCOL_TRANSMITTER_ONLY));
                 } else {
                     HashSet<ServerElement> elementSet;
