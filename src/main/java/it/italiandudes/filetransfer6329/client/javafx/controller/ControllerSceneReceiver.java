@@ -42,6 +42,7 @@ public final class ControllerSceneReceiver {
     private Socket connection = null;
     private static long filesize = 0;
     private static long receivedBytes = 0;
+    private static volatile boolean stageShowed = false;
     private static boolean downloadCanceled = false;
 
     // Methods
@@ -53,6 +54,9 @@ public final class ControllerSceneReceiver {
     }
     public static void setDownloadCanceled() {
         downloadCanceled = true;
+    }
+    public static void setStageShowed() {
+        stageShowed = true;
     }
 
     // Graphic Elements
@@ -133,10 +137,13 @@ public final class ControllerSceneReceiver {
                                 case DOWNLOADING:
                                     filesize = RawSerializer.receiveLong(connection.getInputStream());
                                     receivedBytes = 0;
+                                    stageShowed = false;
                                     Platform.runLater(() -> {
                                         Stage popupStage = Client.initPopupStage(SceneDownloadProgressBar.getScene());
                                         popupStage.showAndWait();
                                     });
+                                    //noinspection StatementWithEmptyBody
+                                    while (!stageShowed);
                                     byte[] buffer = new byte[Defs.BYTE_ARRAY_MAX_SIZE];
                                     try (FileOutputStream fileWriter = new FileOutputStream(finalFile)) {
                                         int bytesRead;
@@ -161,12 +168,14 @@ public final class ControllerSceneReceiver {
                                             if (SocketProtocol.DOWNLOAD_COMPLETE == SocketProtocol.getRequestByInt(completeDownload)) {
                                                 Platform.runLater(() -> new InformationAlert("SUCCESSO", "Download Completato", "Il download e' stato completato. Il file si trova in \"" + finalFile.getAbsolutePath() + "\""));
                                             } else {
+                                                Logger.log("STATE RECEIVED: " + completeDownload);
                                                 throw new IOException("Download failed: confirm not arrived");
                                             }
                                         }
                                         receivedBytes = 0;
                                         filesize = 0;
                                         downloadCanceled = false;
+                                        stageShowed = false;
                                     } catch (FileNotFoundException e) {
                                         throw new IOException(e);
                                     }

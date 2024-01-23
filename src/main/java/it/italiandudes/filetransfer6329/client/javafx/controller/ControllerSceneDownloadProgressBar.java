@@ -30,6 +30,7 @@ public final class ControllerSceneDownloadProgressBar {
     private void initialize() {
         ((Stage)(mainPane.getScene().getWindow())).setResizable(false);
         initializeDownloadProgress(totalBytes);
+        ControllerSceneReceiver.setStageShowed();
         new Service<Void>() {
             @Override
             protected Task<Void> createTask() {

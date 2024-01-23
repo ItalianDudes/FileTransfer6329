@@ -74,14 +74,15 @@ public class ClientHandler extends Thread {
                                     long bytesSent = 0;
                                     int bytesRead;
                                     boolean downloadCanceled = false;
-                                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                    while (((bytesRead = inputStream.read(buffer)) != -1)) {
                                         connection.getOutputStream().write(buffer, 0, bytesRead);
                                         connection.getOutputStream().flush();
                                         bytesSent += bytesRead;
                                         if (SocketProtocol.getRequestByInt(RawSerializer.receiveInt(connection.getInputStream())) != SocketProtocol.OK) {
+                                            downloadCanceled = true;
                                             break;
                                         }
-                                        if (bytesSent == filesize) break;
+                                        if (bytesSent >= filesize) break;
                                     }
                                     if (!downloadCanceled) RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.DOWNLOAD_COMPLETE));
                                 } catch (FileNotFoundException e) {
