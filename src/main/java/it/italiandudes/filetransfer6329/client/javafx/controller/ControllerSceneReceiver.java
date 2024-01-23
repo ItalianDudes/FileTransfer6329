@@ -4,6 +4,7 @@ import it.italiandudes.filetransfer6329.client.javafx.Client;
 import it.italiandudes.filetransfer6329.client.javafx.alert.ErrorAlert;
 import it.italiandudes.filetransfer6329.client.javafx.alert.InformationAlert;
 import it.italiandudes.filetransfer6329.client.javafx.data.ClientElement;
+import it.italiandudes.filetransfer6329.client.javafx.scene.SceneDownloadProgressBar;
 import it.italiandudes.filetransfer6329.client.javafx.scene.SceneMainMenu;
 import it.italiandudes.filetransfer6329.client.javafx.socket.SocketProtocol;
 import it.italiandudes.filetransfer6329.client.javafx.util.UIElementConfigurator;
@@ -19,6 +20,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -38,6 +40,20 @@ public final class ControllerSceneReceiver {
 
     // Attributes
     private Socket connection = null;
+    private static long filesize = 0;
+    private static long receivedBytes = 0;
+    private static boolean downloadCanceled = false;
+
+    // Methods
+    public static long getTotalBytes() {
+        return filesize;
+    }
+    public static long getCurrentBytes() {
+        return receivedBytes;
+    }
+    public static void setDownloadCanceled() {
+        downloadCanceled = true;
+    }
 
     // Graphic Elements
     @FXML private TableView<ClientElement> tableViewFileList;
@@ -83,6 +99,9 @@ public final class ControllerSceneReceiver {
         }
         if (file == null) return;
         File finalFile = file;
+        receivedBytes = 0;
+        filesize = 0;
+        downloadCanceled = false;
         buttonDownloadFile.setDisable(true);
         new Service<Void>() {
             @Override
@@ -112,25 +131,42 @@ public final class ControllerSceneReceiver {
                                     });
                                     break;
                                 case DOWNLOADING:
-                                    long filesize = RawSerializer.receiveLong(connection.getInputStream());
-                                    long receivedBytes = 0;
+                                    filesize = RawSerializer.receiveLong(connection.getInputStream());
+                                    receivedBytes = 0;
+                                    Platform.runLater(() -> {
+                                        Stage popupStage = Client.initPopupStage(SceneDownloadProgressBar.getScene());
+                                        popupStage.showAndWait();
+                                    });
                                     byte[] buffer = new byte[Defs.BYTE_ARRAY_MAX_SIZE];
                                     try (FileOutputStream fileWriter = new FileOutputStream(finalFile)) {
                                         int bytesRead;
-                                        while ((bytesRead = connection.getInputStream().read(buffer, 0, buffer.length)) != -1) {
+                                        while (((bytesRead = connection.getInputStream().read(buffer, 0, buffer.length)) != -1)) {
                                             fileWriter.write(buffer, 0, bytesRead);
                                             receivedBytes += bytesRead;
-                                            RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.OK));
+                                            if (downloadCanceled) {
+                                                RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.DOWNLOAD_CANCELED));
+                                            } else {
+                                                RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.OK));
+                                            }
                                             Logger.log(receivedBytes + " / " + filesize);
                                             if (receivedBytes >= filesize) break;
                                         }
                                         fileWriter.flush();
-                                        int completeDownload = RawSerializer.receiveInt(connection.getInputStream());
-                                        if (SocketProtocol.DOWNLOAD_COMPLETE == SocketProtocol.getRequestByInt(completeDownload)) {
-                                            Platform.runLater(() -> new InformationAlert("SUCCESSO", "Download Completato", "Il download e' stato completato. Il file si trova in \"" + finalFile.getAbsolutePath() + "\""));
+                                        if (downloadCanceled) {
+                                            fileWriter.close();
+                                            //noinspection ResultOfMethodCallIgnored
+                                            finalFile.delete();
                                         } else {
-                                            throw new IOException("Download failed: confirm not arrived");
+                                            int completeDownload = RawSerializer.receiveInt(connection.getInputStream());
+                                            if (SocketProtocol.DOWNLOAD_COMPLETE == SocketProtocol.getRequestByInt(completeDownload)) {
+                                                Platform.runLater(() -> new InformationAlert("SUCCESSO", "Download Completato", "Il download e' stato completato. Il file si trova in \"" + finalFile.getAbsolutePath() + "\""));
+                                            } else {
+                                                throw new IOException("Download failed: confirm not arrived");
+                                            }
                                         }
+                                        receivedBytes = 0;
+                                        filesize = 0;
+                                        downloadCanceled = false;
                                     } catch (FileNotFoundException e) {
                                         throw new IOException(e);
                                     }

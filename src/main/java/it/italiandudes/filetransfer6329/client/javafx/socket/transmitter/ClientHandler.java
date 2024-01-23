@@ -73,17 +73,17 @@ public class ClientHandler extends Thread {
                                     byte[] buffer = new byte[Defs.BYTE_ARRAY_MAX_SIZE];
                                     long bytesSent = 0;
                                     int bytesRead;
+                                    boolean downloadCanceled = false;
                                     while ((bytesRead = inputStream.read(buffer)) != -1) {
                                         connection.getOutputStream().write(buffer, 0, bytesRead);
                                         connection.getOutputStream().flush();
                                         bytesSent += bytesRead;
-                                        Logger.log(bytesSent + " / " + filesize);
                                         if (SocketProtocol.getRequestByInt(RawSerializer.receiveInt(connection.getInputStream())) != SocketProtocol.OK) {
-                                            throw new IOException("A client error has occurred, this connection is terminated");
+                                            break;
                                         }
                                         if (bytesSent == filesize) break;
                                     }
-                                    RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.DOWNLOAD_COMPLETE));
+                                    if (!downloadCanceled) RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.DOWNLOAD_COMPLETE));
                                 } catch (FileNotFoundException e) {
                                     Logger.log(e);
                                     RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.FILE_NO_MORE_AVAILABLE));

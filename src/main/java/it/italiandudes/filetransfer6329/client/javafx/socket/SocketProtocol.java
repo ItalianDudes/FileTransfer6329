@@ -17,7 +17,8 @@ public enum SocketProtocol {
     FILE_NO_MORE_AVAILABLE(ProtocolUsability.TRANSMITTER_ONLY),
     DOWNLOADING(ProtocolUsability.TRANSMITTER_ONLY),
     DOWNLOAD_COMPLETE(ProtocolUsability.TRANSMITTER_ONLY),
-    OK(ProtocolUsability.BOTH);
+    OK(ProtocolUsability.BOTH),
+    DOWNLOAD_CANCELED(ProtocolUsability.RECEIVER_ONLY);
 
     // Attributes
     private final ProtocolUsability usability;

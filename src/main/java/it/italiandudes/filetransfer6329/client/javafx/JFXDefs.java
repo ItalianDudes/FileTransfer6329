@@ -36,6 +36,7 @@ public final class JFXDefs {
             public static final String FXML_SETTINGS_EDITOR = FXML_DIR + "SceneSettingsEditor.fxml";
             public static final String FXML_TRANSMITTER = FXML_DIR + "SceneTransmitter.fxml";
             public static final String FXML_RECEIVER = FXML_DIR + "SceneReceiver.fxml";
+            public static final String FXML_DOWNLOAD_PROGRESS_BAR = FXML_DIR + "SceneDownloadProgressBar.fxml";
         }
 
         // GIF Location
