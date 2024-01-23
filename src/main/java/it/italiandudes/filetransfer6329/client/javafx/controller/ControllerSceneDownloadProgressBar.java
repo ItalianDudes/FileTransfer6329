@@ -28,7 +28,7 @@ public final class ControllerSceneDownloadProgressBar {
     // Initialize
     @FXML
     private void initialize() {
-        ((Stage)(mainPane.getScene().getWindow())).setResizable(false);
+        // ((Stage)(mainPane.getScene().getWindow())).setResizable(false);
         initializeDownloadProgress(totalBytes);
         ControllerSceneReceiver.setStageShowed();
         new Service<Void>() {

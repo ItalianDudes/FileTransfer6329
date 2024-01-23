@@ -147,19 +147,30 @@ public final class ControllerSceneReceiver {
                                     byte[] buffer = new byte[Defs.BYTE_ARRAY_MAX_SIZE];
                                     try (FileOutputStream fileWriter = new FileOutputStream(finalFile)) {
                                         int bytesRead;
+                                        boolean exitForDownloadCanceled = false;
                                         while (((bytesRead = connection.getInputStream().read(buffer, 0, buffer.length)) != -1)) {
                                             fileWriter.write(buffer, 0, bytesRead);
                                             receivedBytes += bytesRead;
-                                            if (downloadCanceled) {
-                                                RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.DOWNLOAD_CANCELED));
-                                            } else {
+                                            Logger.log(bytesRead + " [" + receivedBytes + " / " + filesize + "]");
+                                            if (receivedBytes >= filesize) {
+                                                Logger.log("LAST OK");
                                                 RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.OK));
+                                                RawSerializer.receiveInt(connection.getInputStream());
+                                                break;
                                             }
-                                            Logger.log(receivedBytes + " / " + filesize);
-                                            if (receivedBytes >= filesize) break;
+                                            if (downloadCanceled) {
+                                                Logger.log("DOWNLOAD CANCELED");
+                                                RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.DOWNLOAD_CANCELED));
+                                                exitForDownloadCanceled = true;
+                                                break;
+                                            } else {
+                                                Logger.log("OK");
+                                                RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.OK));
+                                                RawSerializer.receiveInt(connection.getInputStream());
+                                            }
                                         }
                                         fileWriter.flush();
-                                        if (downloadCanceled) {
+                                        if (exitForDownloadCanceled) {
                                             fileWriter.close();
                                             //noinspection ResultOfMethodCallIgnored
                                             finalFile.delete();
