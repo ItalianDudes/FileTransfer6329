@@ -24,6 +24,13 @@ public final class Defs {
         }
     }
 
+    // JSON Element Key
+    public static final class ElementJSONKeys {
+        public static final String FILENAME = "filename";
+        public static final String ID = "id";
+        public static final String FILESIZE_KB = "filesize_kb";
+    }
+
     // JSON Settings
     public static final class SettingsKeys {
         public static final String ENABLE_DARK_MODE = "enableDarkMode";

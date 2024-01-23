@@ -21,6 +21,10 @@ public final class JFXDefs {
         public static final double SCREEN_HEIGHT = SCREEN_RESOLUTION.getHeight();
     }
 
+    // Preloaded Images
+    public static final Image IMAGE_ONLINE = new Image(Defs.Resources.getAsStream(Defs.Resources.Image.IMAGE_ONLINE));
+    public static final Image IMAGE_OFFLINE = new Image(Defs.Resources.getAsStream(Defs.Resources.Image.IMAGE_OFFLINE));
+
     // Resource Locations
     public static final class Resources {
 

@@ -4,6 +4,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TableColumn?>
@@ -83,8 +84,9 @@
             </GridPane>
             <TableView fx:id="tableViewFileList" focusTraversable="false" style="-fx-font-family: Lucida Sans; -fx-font-size: 16px; -fx-border-color: black; -fx-border-radius: 2px; -fx-border-width: 2px;" GridPane.rowIndex="1">
               <columns>
+                  <TableColumn fx:id="tableColumnID" maxWidth="-Infinity" minWidth="150.0" prefWidth="150.0" text="ID" />
                 <TableColumn fx:id="tableColumnFilename" maxWidth="-Infinity" minWidth="250.0" prefWidth="250.0" text="Nome File" />
-                <TableColumn fx:id="tableColumnFileAbsolutePath" maxWidth="1.7976931348623157E308" minWidth="810.0" prefWidth="810.0" text="Percorso Completo" />
+                <TableColumn fx:id="tableColumnFileAbsolutePath" maxWidth="1.7976931348623157E308" minWidth="660.0" prefWidth="660.0" text="Percorso Completo" />
                   <TableColumn fx:id="tableColumnFileSizeKB" maxWidth="1.7976931348623157E308" minWidth="200.0" prefWidth="200.0" text="Peso File (KB)" />
               </columns>
                <columnResizePolicy>
@@ -96,16 +98,26 @@
                   <Font name="Lucida Sans Regular" size="16.0" />
                </font>
             </TextArea>
-            <GridPane hgap="5.0" style="-fx-border-color: black; -fx-border-radius: 4px; -fx-border-width: 2px;" GridPane.rowIndex="3">
+            <GridPane hgap="5.0" style="-fx-border-color: black; -fx-border-radius: 4px; -fx-border-width: 2px;" vgap="5.0" GridPane.rowIndex="3">
               <columnConstraints>
-                <ColumnConstraints halignment="CENTER" hgrow="NEVER" />
+                  <ColumnConstraints halignment="RIGHT" hgrow="NEVER" />
                 <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" />
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints valignment="CENTER" vgrow="SOMETIMES" />
+                  <RowConstraints valignment="CENTER" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label contentDisplay="RIGHT" text="PORTA">
+                  <Label contentDisplay="RIGHT" layoutX="122.0" layoutY="17.0" text="VELOCITA'">
+                     <graphic>
+                        <Spinner fx:id="spinnerTransferSpeed" editable="true" focusTraversable="false" style="-fx-font-family: Lucida Sans; -fx-font-size: 24px;" />
+                     </graphic>
+                     <font>
+                        <Font name="Lucida Sans Demibold" size="24.0" />
+                     </font>
+                  </Label>
+                  <ComboBox fx:id="comboBoxTransferSpeedMagnitude" maxWidth="1.7976931348623157E308" onAction="#updateTransferSpeedMagnitude" promptText="Ordine di Grandezza" style="-fx-font-size: 24px; -fx-font-family: Lucida Sans; -fx-font-weight: Bold;" GridPane.columnIndex="1" />
+                  <Label contentDisplay="RIGHT" text="PORTA" GridPane.rowIndex="1">
                      <graphic>
                         <Spinner fx:id="spinnerPort" editable="true" focusTraversable="false" style="-fx-font-family: Lucida Sans; -fx-font-size: 24px;" />
                      </graphic>
@@ -113,16 +125,12 @@
                         <Font name="Lucida Sans Demibold" size="24.0" />
                      </font>
                   </Label>
-                  <Button fx:id="buttonConnectionStatus" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#changeConnectionStatus" text="VAI ONLINE" GridPane.columnIndex="1">
+                  <Button fx:id="buttonConnectionStatus" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#changeConnectionStatus" text="VAI ONLINE" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <font>
                         <Font name="Lucida Sans Demibold" size="24.0" />
                      </font>
                      <graphic>
-                        <ImageView fx:id="imageViewConnectionStatus" fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../image/offline.png" />
-                           </image>
-                        </ImageView>
+                        <ImageView fx:id="imageViewConnectionStatus" fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" />
                      </graphic>
                   </Button>
                </children>

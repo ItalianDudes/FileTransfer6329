@@ -4,48 +4,56 @@ import it.italiandudes.filetransfer6329.client.javafx.Client;
 import it.italiandudes.filetransfer6329.client.javafx.alert.ErrorAlert;
 import it.italiandudes.filetransfer6329.client.javafx.data.ServerElement;
 import it.italiandudes.filetransfer6329.client.javafx.scene.SceneMainMenu;
+import it.italiandudes.filetransfer6329.client.javafx.socket.SpeedOrderMagnitude;
+import it.italiandudes.filetransfer6329.client.javafx.socket.TransferSpeed;
 import it.italiandudes.filetransfer6329.client.javafx.socket.transmitter.ClientHandler;
 import it.italiandudes.filetransfer6329.client.javafx.socket.transmitter.ServerListener;
 import it.italiandudes.filetransfer6329.client.javafx.util.UIElementConfigurator;
 import it.italiandudes.filetransfer6329.utils.Defs;
 import it.italiandudes.idl.common.Logger;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
+
+import static it.italiandudes.filetransfer6329.client.javafx.JFXDefs.IMAGE_OFFLINE;
+import static it.italiandudes.filetransfer6329.client.javafx.JFXDefs.IMAGE_ONLINE;
 
 public final class ControllerSceneTransmitter {
 
     // Attributes
-    private static final Image IMAGE_ONLINE = new Image(Defs.Resources.getAsStream(Defs.Resources.Image.IMAGE_ONLINE));
-    private static final Image IMAGE_OFFLINE = new Image(Defs.Resources.getAsStream(Defs.Resources.Image.IMAGE_OFFLINE));
     private boolean isOnline = false;
     private ServerSocket serverSocket = null;
     private ServerListener serverListener = null;
-    private HashMap<Socket, ClientHandler> activeConnections = null;
+    private static TransferSpeed transferSpeed = new TransferSpeed(100, SpeedOrderMagnitude.MB_PER_SECOND);
+    public static HashMap<Socket, ClientHandler> activeConnections = null;
+    private static HashSet<ServerElement> availableFileSet = null;
+    private static TableView<ServerElement> staticTableView;
 
     // Graphic Elements
     @FXML private TableView<ServerElement> tableViewFileList;
+    @FXML private TableColumn<ServerElement, Integer> tableColumnID;
     @FXML private TableColumn<ServerElement, String> tableColumnFilename;
     @FXML private TableColumn<ServerElement, String> tableColumnFileAbsolutePath;
     @FXML private TableColumn<ServerElement, Long> tableColumnFileSizeKB;
     @FXML private TextArea textAreaLog;
+    private static TextArea staticTextAreaLog = null;
+    @FXML private ComboBox<SpeedOrderMagnitude> comboBoxTransferSpeedMagnitude;
     @FXML private Spinner<Integer> spinnerPort;
+    @FXML private Spinner<Integer> spinnerTransferSpeed;
     @FXML private ImageView imageViewConnectionStatus;
     @FXML private Button buttonConnectionStatus;
 
@@ -53,15 +61,47 @@ public final class ControllerSceneTransmitter {
     @FXML
     private void initialize() {
         Client.getStage().setResizable(true);
+        availableFileSet = new HashSet<>();
+        staticTextAreaLog = textAreaLog;
+        staticTableView = tableViewFileList;
+        comboBoxTransferSpeedMagnitude.setItems(FXCollections.observableList(SpeedOrderMagnitude.getList()));
+        comboBoxTransferSpeedMagnitude.getSelectionModel().select(SpeedOrderMagnitude.MB_PER_SECOND);
         spinnerPort.getEditor().setTextFormatter(UIElementConfigurator.configureNewIntegerTextFormatter());
         spinnerPort.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 65535, 21, 1));
+        spinnerTransferSpeed.getEditor().setTextFormatter(UIElementConfigurator.configureNewIntegerTextFormatter());
+        spinnerTransferSpeed.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 100, 1));
         imageViewConnectionStatus.setImage(IMAGE_OFFLINE);
+        tableColumnID.setCellValueFactory(new PropertyValueFactory<>("id"));
         tableColumnFilename.setCellValueFactory(new PropertyValueFactory<>("filename"));
         tableColumnFileAbsolutePath.setCellValueFactory(new PropertyValueFactory<>("fileAbsolutePath"));
         tableColumnFileSizeKB.setCellValueFactory(new PropertyValueFactory<>("fileSizeKB"));
     }
 
+    // Methods
+    public static void writeMessageOnLog(@NotNull final String message) {
+        Platform.runLater(() -> {
+            if (staticTextAreaLog != null) {
+                staticTextAreaLog.appendText(message + '\n');
+            }
+        });
+    }
+    @NotNull
+    public static HashSet<ServerElement> getElementList() {
+        return new HashSet<>(availableFileSet);
+    }
+    public static TransferSpeed getTransferSpeed() {
+        return transferSpeed;
+    }
+    public static void removeUnavailableElementFromList(@NotNull final ServerElement element) {
+        availableFileSet.remove(element);
+        Platform.runLater(() -> staticTableView.getItems().remove(element));
+    }
+
     // EDT
+    @FXML
+    private void updateTransferSpeedMagnitude() {
+        transferSpeed = new TransferSpeed(spinnerTransferSpeed.getValue(), comboBoxTransferSpeedMagnitude.getSelectionModel().getSelectedItem());
+    }
     @FXML
     private void addFile() {
         FileChooser fileChooser = new FileChooser();
@@ -82,7 +122,9 @@ public final class ControllerSceneTransmitter {
             ArrayList<String> failPath = new ArrayList<>();
             for (File file : fileSet) {
                 try {
-                    tableViewFileList.getItems().add(new ServerElement(file));
+                    ServerElement element = new ServerElement(file);
+                    tableViewFileList.getItems().add(element);
+                    availableFileSet.add(element);
                     success++;
                 } catch (FileNotFoundException e) {
                     fail++;
@@ -107,10 +149,17 @@ public final class ControllerSceneTransmitter {
         ServerElement element = tableViewFileList.getSelectionModel().getSelectedItem();
         if (element != null) {
             tableViewFileList.getItems().remove(element);
+            availableFileSet.remove(element);
         }
     }
     @FXML
     private void changeConnectionStatus() {
+        int port;
+        try {
+            port = Integer.parseInt(spinnerPort.getEditor().getText());
+        } catch (NumberFormatException e) {
+            return;
+        }
         buttonConnectionStatus.setDisable(true);
         if (isOnline) {
             new Service<Void>() {
@@ -127,13 +176,26 @@ public final class ControllerSceneTransmitter {
                                 Platform.runLater(() -> new ErrorAlert("ERRORE", "Errore di I/O", "Si e' verificato un errore durante la disconnessione. Controlla i log per ulteriori informazioni."));
                             }
                             serverListener = null;
+                            Set<Socket> connections = activeConnections.keySet();
+                            for (Socket connection : connections) {
+                                try {
+                                    activeConnections.get(connection).interrupt();
+                                } catch (NullPointerException ignored) {}
+                                activeConnections.remove(connection);
+                                try {
+                                    connection.close();
+                                } catch (Exception ignored) {}
+                            }
+                            activeConnections.clear();
                             activeConnections = null;
                             Platform.runLater(() -> {
                                 isOnline = false;
                                 buttonConnectionStatus.setText("VAI ONLINE");
                                 imageViewConnectionStatus.setImage(IMAGE_OFFLINE);
                                 spinnerPort.setDisable(false);
+                                spinnerTransferSpeed.setDisable(false);
                                 buttonConnectionStatus.setDisable(false);
+                                comboBoxTransferSpeedMagnitude.setDisable(false);
                             });
                             return null;
                         }
@@ -142,6 +204,8 @@ public final class ControllerSceneTransmitter {
             }.start();
         } else {
             spinnerPort.setDisable(true);
+            spinnerTransferSpeed.setDisable(true);
+            comboBoxTransferSpeedMagnitude.setDisable(true);
             new Service<Void>() {
                 @Override
                 protected Task<Void> createTask() {
@@ -149,16 +213,15 @@ public final class ControllerSceneTransmitter {
                         @Override
                         protected Void call() {
                             try {
-                                Thread.sleep(5000);
-                            } catch (Exception ignored) {}
-                            try {
-                                serverSocket = new ServerSocket(spinnerPort.getValue());
+                                serverSocket = new ServerSocket(port);
                             } catch (IllegalArgumentException iae) {
                                 Logger.log(iae);
                                 Platform.runLater(() -> {
                                     serverSocket = null;
                                     new ErrorAlert("ERRORE", "Errore di Inserimento", "La porta fornita non e' valida.\nInserire una porta compresa tra 0 e 65535 (estremi inclusi).\nRicorda: la porta deve essere aperta sia sul firewall del dispositivo che sul firewall del tuo router!");
                                     spinnerPort.setDisable(false);
+                                    spinnerTransferSpeed.setDisable(false);
+                                    comboBoxTransferSpeedMagnitude.setDisable(false);
                                     buttonConnectionStatus.setDisable(false);
                                 });
                                 return null;
@@ -168,13 +231,16 @@ public final class ControllerSceneTransmitter {
                                     serverSocket = null;
                                     new ErrorAlert("ERRORE", "Errore di I/O", "Si e' verificato un errore di I/O. La connessione non può essere aperta.");
                                     spinnerPort.setDisable(false);
+                                    spinnerTransferSpeed.setDisable(false);
+                                    comboBoxTransferSpeedMagnitude.setDisable(false);
                                     buttonConnectionStatus.setDisable(false);
                                 });
                                 return null;
                             }
                             activeConnections = new HashMap<>();
-                            serverListener = new ServerListener(serverSocket, activeConnections);
+                            serverListener = new ServerListener(serverSocket);
                             serverListener.start();
+                            Logger.log("Listening on port: " + port);
                             Platform.runLater(() -> {
                                 isOnline = true;
                                 buttonConnectionStatus.setText("VAI OFFLINE");
