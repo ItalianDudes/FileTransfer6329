@@ -32,7 +32,7 @@ public final class Defs {
     }
 
     // Byte Array Size
-    public static final int BYTE_ARRAY_MAX_SIZE = 64 * 1024 * 1024; // 64MB
+    public static final int BYTE_ARRAY_MAX_SIZE = 65536; // ~64K DON'T CHANGE THIS, A SINGLE TCP PACKET CAN'T BE BIGGER THAN THIS
 
     // JSON Settings
     public static final class SettingsKeys {
