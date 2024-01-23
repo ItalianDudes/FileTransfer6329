@@ -112,6 +112,7 @@ public final class ControllerSceneReceiver {
                                     break;
                                 case DOWNLOADING:
                                     int transferSpeed = RawSerializer.receiveInt(connection.getInputStream());
+                                    if (transferSpeed <= 0) transferSpeed = Integer.MAX_VALUE;
                                     connection.setReceiveBufferSize(transferSpeed);
                                     long filesize = RawSerializer.receiveLong(connection.getInputStream());
                                     int receivedBytes = 0;
