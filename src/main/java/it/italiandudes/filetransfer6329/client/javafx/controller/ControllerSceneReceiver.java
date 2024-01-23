@@ -32,6 +32,7 @@ import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static it.italiandudes.filetransfer6329.client.javafx.JFXDefs.IMAGE_OFFLINE;
 import static it.italiandudes.filetransfer6329.client.javafx.JFXDefs.IMAGE_ONLINE;
@@ -138,9 +139,10 @@ public final class ControllerSceneReceiver {
                                     filesize = RawSerializer.receiveLong(connection.getInputStream());
                                     receivedBytes = 0;
                                     stageShowed = false;
+                                    AtomicReference<Stage> popupStage = new AtomicReference<>();
                                     Platform.runLater(() -> {
-                                        Stage popupStage = Client.initPopupStage(SceneDownloadProgressBar.getScene());
-                                        popupStage.showAndWait();
+                                        popupStage.set(Client.initPopupStage(SceneDownloadProgressBar.getScene()));
+                                        popupStage.get().showAndWait();
                                     });
                                     //noinspection StatementWithEmptyBody
                                     while (!stageShowed);
@@ -148,10 +150,16 @@ public final class ControllerSceneReceiver {
                                     try (FileOutputStream fileWriter = new FileOutputStream(finalFile)) {
                                         while (receivedBytes < filesize) {
                                             int expectedBytes = RawSerializer.receiveInt(connection.getInputStream());
-                                            int bytesRead = connection.getInputStream().read(buffer, 0, expectedBytes);
+                                            int bytesRead = 0;
+                                            while (bytesRead < expectedBytes) {
+                                                int localRead = connection.getInputStream().read(buffer, 0, expectedBytes);
+                                                if (localRead != -1) bytesRead += localRead;
+                                            }
                                             if (expectedBytes != bytesRead) {
+                                                receivedBytes = filesize;
                                                 throw new IOException("Bytes mismatch: expected " + expectedBytes + ", received " + bytesRead);
                                             }
+                                            receivedBytes += bytesRead;
                                             fileWriter.write(buffer, 0, bytesRead);
                                             fileWriter.flush();
                                             if (downloadCanceled) {
@@ -161,6 +169,7 @@ public final class ControllerSceneReceiver {
                                                 RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.OK));
                                             }
                                         }
+                                        Platform.runLater(() -> popupStage.get().close());
                                         if (downloadCanceled) {
                                             fileWriter.close();
                                             //noinspection ResultOfMethodCallIgnored
@@ -171,7 +180,6 @@ public final class ControllerSceneReceiver {
                                             if (SocketProtocol.DOWNLOAD_COMPLETE == SocketProtocol.getRequestByInt(completeDownload)) {
                                                 Platform.runLater(() -> new InformationAlert("SUCCESSO", "Download Completato", "Il download e' stato completato. Il file si trova in \"" + finalFile.getAbsolutePath() + "\""));
                                             } else {
-                                                Logger.log("STATE RECEIVED: " + completeDownload);
                                                 throw new IOException("Download failed: confirm not arrived");
                                             }
                                         }
@@ -186,6 +194,7 @@ public final class ControllerSceneReceiver {
                                 default:
                                     throw new IOException("Protocol not respected");
                             }
+                            buttonDownloadFile.setDisable(false);
                         } catch (IOException e) {
                             Logger.log(e);
                             Platform.runLater(() -> {
