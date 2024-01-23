@@ -120,9 +120,9 @@ public final class ControllerSceneReceiver {
                                         while ((bytesRead = connection.getInputStream().read(buffer)) != -1) {
                                             fileWriter.write(buffer);
                                             receivedBytes += bytesRead;
+                                            RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.OK));
                                             if (receivedBytes == filesize) break;
                                         }
-                                        Logger.log("DOWNLOAD COMPLETED!");
                                         fileWriter.flush();
                                         int completeDownload = RawSerializer.receiveInt(connection.getInputStream());
                                         if (SocketProtocol.DOWNLOAD_COMPLETE == SocketProtocol.getRequestByInt(completeDownload)) {

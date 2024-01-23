@@ -79,10 +79,12 @@ public class ClientHandler extends Thread {
                                         connection.getOutputStream().write(buffer, 0, bytesRead);
                                         connection.getOutputStream().flush();
                                         bytesSent += bytesRead;
+                                        if (SocketProtocol.getRequestByInt(RawSerializer.receiveInt(connection.getInputStream())) != SocketProtocol.OK) {
+                                            throw new IOException("A client error has occurred, this connection is terminated");
+                                        }
                                         if (bytesSent == filesize) break;
                                     }
                                     RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.DOWNLOAD_COMPLETE));
-                                    Logger.log("FILE SEND COMPLETED! Sent: " + bytesSent + " bytes");
                                 } catch (FileNotFoundException e) {
                                     Logger.log(e);
                                     RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.FILE_NO_MORE_AVAILABLE));
