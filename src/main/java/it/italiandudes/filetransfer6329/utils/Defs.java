@@ -31,6 +31,9 @@ public final class Defs {
         public static final String FILESIZE_KB = "filesize_kb";
     }
 
+    // Byte Array Size
+    public static final int BYTE_ARRAY_MAX_SIZE = 64 * 1024 * 1024; // 64MB
+
     // JSON Settings
     public static final class SettingsKeys {
         public static final String ENABLE_DARK_MODE = "enableDarkMode";

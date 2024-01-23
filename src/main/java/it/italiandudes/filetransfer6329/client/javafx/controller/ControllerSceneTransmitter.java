@@ -4,15 +4,12 @@ import it.italiandudes.filetransfer6329.client.javafx.Client;
 import it.italiandudes.filetransfer6329.client.javafx.alert.ErrorAlert;
 import it.italiandudes.filetransfer6329.client.javafx.data.ServerElement;
 import it.italiandudes.filetransfer6329.client.javafx.scene.SceneMainMenu;
-import it.italiandudes.filetransfer6329.client.javafx.socket.SpeedOrderMagnitude;
-import it.italiandudes.filetransfer6329.client.javafx.socket.TransferSpeed;
 import it.italiandudes.filetransfer6329.client.javafx.socket.transmitter.ClientHandler;
 import it.italiandudes.filetransfer6329.client.javafx.socket.transmitter.ServerListener;
 import it.italiandudes.filetransfer6329.client.javafx.util.UIElementConfigurator;
 import it.italiandudes.filetransfer6329.utils.Defs;
 import it.italiandudes.idl.common.Logger;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -38,7 +35,6 @@ public final class ControllerSceneTransmitter {
     private boolean isOnline = false;
     private ServerSocket serverSocket = null;
     private ServerListener serverListener = null;
-    private static TransferSpeed transferSpeed = new TransferSpeed(100, SpeedOrderMagnitude.MB_PER_SECOND);
     public static HashMap<Socket, ClientHandler> activeConnections = null;
     private static HashSet<ServerElement> availableFileSet = null;
     private static TableView<ServerElement> staticTableView;
@@ -51,25 +47,19 @@ public final class ControllerSceneTransmitter {
     @FXML private TableColumn<ServerElement, Long> tableColumnFileSizeKB;
     @FXML private TextArea textAreaLog;
     private static TextArea staticTextAreaLog = null;
-    @FXML private ComboBox<SpeedOrderMagnitude> comboBoxTransferSpeedMagnitude;
     @FXML private Spinner<Integer> spinnerPort;
-    @FXML private Spinner<Integer> spinnerTransferSpeed;
     @FXML private ImageView imageViewConnectionStatus;
     @FXML private Button buttonConnectionStatus;
 
     // Initialize
-    @FXML
+    @FXML @SuppressWarnings("DuplicatedCode")
     private void initialize() {
         Client.getStage().setResizable(true);
         availableFileSet = new HashSet<>();
         staticTextAreaLog = textAreaLog;
         staticTableView = tableViewFileList;
-        comboBoxTransferSpeedMagnitude.setItems(FXCollections.observableList(SpeedOrderMagnitude.getList()));
-        comboBoxTransferSpeedMagnitude.getSelectionModel().select(SpeedOrderMagnitude.MB_PER_SECOND);
         spinnerPort.getEditor().setTextFormatter(UIElementConfigurator.configureNewIntegerTextFormatter());
         spinnerPort.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 65535, 21, 1));
-        spinnerTransferSpeed.getEditor().setTextFormatter(UIElementConfigurator.configureNewIntegerTextFormatter());
-        spinnerTransferSpeed.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 100, 1));
         imageViewConnectionStatus.setImage(IMAGE_OFFLINE);
         tableColumnID.setCellValueFactory(new PropertyValueFactory<>("id"));
         tableColumnFilename.setCellValueFactory(new PropertyValueFactory<>("filename"));
@@ -89,19 +79,12 @@ public final class ControllerSceneTransmitter {
     public static HashSet<ServerElement> getElementList() {
         return new HashSet<>(availableFileSet);
     }
-    public static TransferSpeed getTransferSpeed() {
-        return transferSpeed;
-    }
     public static void removeUnavailableElementFromList(@NotNull final ServerElement element) {
         availableFileSet.remove(element);
         Platform.runLater(() -> staticTableView.getItems().remove(element));
     }
 
     // EDT
-    @FXML
-    private void updateTransferSpeedMagnitude() {
-        transferSpeed = new TransferSpeed(spinnerTransferSpeed.getValue(), comboBoxTransferSpeedMagnitude.getSelectionModel().getSelectedItem());
-    }
     @FXML
     private void addFile() {
         FileChooser fileChooser = new FileChooser();
@@ -193,9 +176,7 @@ public final class ControllerSceneTransmitter {
                                 buttonConnectionStatus.setText("VAI ONLINE");
                                 imageViewConnectionStatus.setImage(IMAGE_OFFLINE);
                                 spinnerPort.setDisable(false);
-                                spinnerTransferSpeed.setDisable(false);
                                 buttonConnectionStatus.setDisable(false);
-                                comboBoxTransferSpeedMagnitude.setDisable(false);
                             });
                             return null;
                         }
@@ -204,14 +185,13 @@ public final class ControllerSceneTransmitter {
             }.start();
         } else {
             spinnerPort.setDisable(true);
-            spinnerTransferSpeed.setDisable(true);
-            comboBoxTransferSpeedMagnitude.setDisable(true);
             new Service<Void>() {
                 @Override
                 protected Task<Void> createTask() {
                     return new Task<Void>() {
                         @Override
                         protected Void call() {
+                            //noinspection DuplicatedCode
                             try {
                                 serverSocket = new ServerSocket(port);
                             } catch (IllegalArgumentException iae) {
@@ -220,8 +200,6 @@ public final class ControllerSceneTransmitter {
                                     serverSocket = null;
                                     new ErrorAlert("ERRORE", "Errore di Inserimento", "La porta fornita non e' valida.\nInserire una porta compresa tra 0 e 65535 (estremi inclusi).\nRicorda: la porta deve essere aperta sia sul firewall del dispositivo che sul firewall del tuo router!");
                                     spinnerPort.setDisable(false);
-                                    spinnerTransferSpeed.setDisable(false);
-                                    comboBoxTransferSpeedMagnitude.setDisable(false);
                                     buttonConnectionStatus.setDisable(false);
                                 });
                                 return null;
@@ -231,8 +209,6 @@ public final class ControllerSceneTransmitter {
                                     serverSocket = null;
                                     new ErrorAlert("ERRORE", "Errore di I/O", "Si e' verificato un errore di I/O. La connessione non può essere aperta.");
                                     spinnerPort.setDisable(false);
-                                    spinnerTransferSpeed.setDisable(false);
-                                    comboBoxTransferSpeedMagnitude.setDisable(false);
                                     buttonConnectionStatus.setDisable(false);
                                 });
                                 return null;

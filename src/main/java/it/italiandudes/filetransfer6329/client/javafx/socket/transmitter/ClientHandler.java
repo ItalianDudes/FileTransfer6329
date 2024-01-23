@@ -4,6 +4,7 @@ import it.italiandudes.filetransfer6329.client.javafx.controller.ControllerScene
 import it.italiandudes.filetransfer6329.client.javafx.data.ServerElement;
 import it.italiandudes.filetransfer6329.client.javafx.socket.ProtocolUsability;
 import it.italiandudes.filetransfer6329.client.javafx.socket.SocketProtocol;
+import it.italiandudes.filetransfer6329.utils.Defs;
 import it.italiandudes.idl.common.Logger;
 import it.italiandudes.idl.common.RawSerializer;
 import org.jetbrains.annotations.NotNull;
@@ -67,13 +68,9 @@ public class ClientHandler extends Thread {
                                 File filePointer = new File(element.getFileAbsolutePath());
                                 try (FileInputStream inputStream = new FileInputStream(filePointer)) {
                                     long filesize = filePointer.length();
-                                    int transferSpeed = ControllerSceneTransmitter.getTransferSpeed().getTransferSpeedBytes();
-                                    if (transferSpeed <= 0) transferSpeed = Integer.MAX_VALUE;
                                     RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.DOWNLOADING));
-                                    RawSerializer.sendInt(connection.getOutputStream(), ControllerSceneTransmitter.getTransferSpeed().getTransferSpeedBytes());
                                     RawSerializer.sendLong(connection.getOutputStream(), filesize);
-                                    connection.setSendBufferSize(transferSpeed);
-                                    byte[] buffer = new byte[transferSpeed];
+                                    byte[] buffer = new byte[Defs.BYTE_ARRAY_MAX_SIZE];
                                     long bytesSent = 0;
                                     int bytesRead;
                                     while ((bytesRead = inputStream.read(buffer)) != -1) {

@@ -53,7 +53,7 @@ public final class ControllerSceneReceiver {
     @FXML private Button buttonRefreshFileList;
 
     // Initialize
-    @FXML
+    @FXML @SuppressWarnings("DuplicatedCode")
     private void initialize() {
         Client.getStage().setResizable(true);
         spinnerPort.getEditor().setTextFormatter(UIElementConfigurator.configureNewIntegerTextFormatter());
@@ -83,6 +83,7 @@ public final class ControllerSceneReceiver {
         }
         if (file == null) return;
         File finalFile = file;
+        buttonDownloadFile.setDisable(true);
         new Service<Void>() {
             @Override
             protected Task<Void> createTask() {
@@ -111,12 +112,9 @@ public final class ControllerSceneReceiver {
                                     });
                                     break;
                                 case DOWNLOADING:
-                                    int transferSpeed = RawSerializer.receiveInt(connection.getInputStream());
-                                    if (transferSpeed <= 0) transferSpeed = Integer.MAX_VALUE;
-                                    connection.setReceiveBufferSize(transferSpeed);
                                     long filesize = RawSerializer.receiveLong(connection.getInputStream());
                                     long receivedBytes = 0;
-                                    byte[] buffer = new byte[transferSpeed];
+                                    byte[] buffer = new byte[Defs.BYTE_ARRAY_MAX_SIZE];
                                     try (FileOutputStream fileWriter = new FileOutputStream(finalFile)) {
                                         int bytesRead;
                                         while ((bytesRead = connection.getInputStream().read(buffer, 0, buffer.length)) != -1) {
@@ -142,7 +140,10 @@ public final class ControllerSceneReceiver {
                             }
                         } catch (IOException e) {
                             Logger.log(e);
-                            Platform.runLater(() -> new ErrorAlert("ERRORE", "Errore di Download", "Si e' verificato un errore durante il download. La connessione e' stata terminata."));
+                            Platform.runLater(() -> {
+                                new ErrorAlert("ERRORE", "Errore di Download", "Si e' verificato un errore durante il download. La connessione e' stata terminata.");
+                                buttonDownloadFile.setDisable(true);
+                            });
                             disconnect();
                         }
                         return null;
