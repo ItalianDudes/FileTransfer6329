@@ -16,7 +16,7 @@ public final class ControllerSceneDownloadProgressBar {
     private boolean initialized = false;
     private final long totalBytes = ControllerSceneReceiver.getTotalBytes();
     private boolean downloadEnd = false;
-    private static final long SLEEP_MILLIS = 5000L;
+    private static final long SLEEP_MILLIS = 500L;
 
     // Graphic Elements
     @FXML private AnchorPane mainPane;
@@ -28,7 +28,7 @@ public final class ControllerSceneDownloadProgressBar {
     // Initialize
     @FXML
     private void initialize() {
-        // ((Stage)(mainPane.getScene().getWindow())).setResizable(false);
+        ((Stage)(mainPane.getScene().getWindow())).setResizable(false);
         initializeDownloadProgress(totalBytes);
         ControllerSceneReceiver.setStageShowed();
         new Service<Void>() {
