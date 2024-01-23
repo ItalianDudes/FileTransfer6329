@@ -74,7 +74,7 @@ public class ClientHandler extends Thread {
                                     long bytesSent = 0;
                                     int bytesRead;
                                     boolean downloadCanceled = false;
-                                    while (((bytesRead = inputStream.read(buffer)) != -1)) {
+                                    while (((bytesRead = inputStream.read(buffer, 0, buffer.length)) != -1)) {
                                         RawSerializer.sendInt(connection.getOutputStream(), bytesRead);
                                         connection.getOutputStream().write(buffer, 0, bytesRead);
                                         connection.getOutputStream().flush();

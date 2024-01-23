@@ -263,6 +263,8 @@ public final class ControllerSceneReceiver {
                         protected Void call() {
                             try {
                                 connection = new Socket(textFieldAddress.getText(), port);
+                                connection.setSendBufferSize(Defs.BYTE_ARRAY_MAX_SIZE * 2);
+                                connection.setReceiveBufferSize(Defs.BYTE_ARRAY_MAX_SIZE * 2);
                             } catch (UnknownHostException uhe) {
                                 Logger.log(uhe);
                                 Platform.runLater(() -> {

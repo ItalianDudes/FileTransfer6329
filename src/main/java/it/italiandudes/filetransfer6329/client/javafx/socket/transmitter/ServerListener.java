@@ -1,6 +1,7 @@
 package it.italiandudes.filetransfer6329.client.javafx.socket.transmitter;
 
 import it.italiandudes.filetransfer6329.client.javafx.controller.ControllerSceneTransmitter;
+import it.italiandudes.filetransfer6329.utils.Defs;
 import it.italiandudes.idl.common.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,6 +33,8 @@ public final class ServerListener extends Thread {
                         incomingConnection.close();
                     } catch (Exception ignored) {}
                 } else {
+                    incomingConnection.setSendBufferSize(Defs.BYTE_ARRAY_MAX_SIZE * 2);
+                    incomingConnection.setReceiveBufferSize(Defs.BYTE_ARRAY_MAX_SIZE * 2);
                     ClientHandler handler = new ClientHandler(incomingConnection);
                     ControllerSceneTransmitter.activeConnections.put(incomingConnection, handler);
                     handler.start();
