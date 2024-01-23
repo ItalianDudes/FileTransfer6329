@@ -86,11 +86,9 @@ public class ClientHandler extends Thread {
                                             downloadCanceled = true;
                                             break;
                                         } else if (answer != SocketProtocol.OK) {
-                                            Logger.log("SEND/RECEIVE BUFFER: " + connection.getSendBufferSize() + "/" + connection.getReceiveBufferSize());
                                             throw new IOException("Unexpected state");
                                         }
                                     }
-                                    Logger.log("DOWNLOAD CANCELED: "+ downloadCanceled);
                                     if (!downloadCanceled) RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.DOWNLOAD_COMPLETE));
                                 } catch (FileNotFoundException e) {
                                     Logger.log(e);
