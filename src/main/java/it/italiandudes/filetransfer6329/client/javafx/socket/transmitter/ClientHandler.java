@@ -75,15 +75,21 @@ public class ClientHandler extends Thread {
                                     int bytesRead;
                                     boolean downloadCanceled = false;
                                     while (((bytesRead = inputStream.read(buffer)) != -1)) {
+                                        RawSerializer.sendInt(connection.getOutputStream(), bytesRead);
                                         connection.getOutputStream().write(buffer, 0, bytesRead);
                                         connection.getOutputStream().flush();
                                         bytesSent += bytesRead;
-                                        if (SocketProtocol.getRequestByInt(RawSerializer.receiveInt(connection.getInputStream())) != SocketProtocol.OK) {
+                                        Logger.log(bytesSent + " / " + filesize);
+                                        int awaitingResponse = RawSerializer.receiveInt(connection.getInputStream());
+                                        SocketProtocol answer = SocketProtocol.getRequestByInt(awaitingResponse);
+                                        if (answer == SocketProtocol.DOWNLOAD_CANCELED) {
                                             downloadCanceled = true;
                                             break;
+                                        } else if (answer != SocketProtocol.OK) {
+                                            throw new IOException("Unexpected state");
                                         }
-                                        if (bytesSent >= filesize) break;
                                     }
+                                    Logger.log("DOWNLOAD CANCELED: "+ downloadCanceled);
                                     if (!downloadCanceled) RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.DOWNLOAD_COMPLETE));
                                 } catch (FileNotFoundException e) {
                                     Logger.log(e);

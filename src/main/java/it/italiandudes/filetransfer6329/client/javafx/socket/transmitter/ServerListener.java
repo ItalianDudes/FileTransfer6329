@@ -27,6 +27,7 @@ public final class ServerListener extends Thread {
             while (true) {
                 Socket incomingConnection = serverSocket.accept();
                 if (ControllerSceneTransmitter.activeConnections.containsKey(incomingConnection)) {
+                    Logger.log("Socket already connected, closing connection...");
                     try {
                         incomingConnection.close();
                     } catch (Exception ignored) {}

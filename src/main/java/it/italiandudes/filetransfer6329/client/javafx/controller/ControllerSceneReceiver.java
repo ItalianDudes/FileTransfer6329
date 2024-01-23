@@ -146,34 +146,26 @@ public final class ControllerSceneReceiver {
                                     while (!stageShowed);
                                     byte[] buffer = new byte[Defs.BYTE_ARRAY_MAX_SIZE];
                                     try (FileOutputStream fileWriter = new FileOutputStream(finalFile)) {
-                                        int bytesRead;
-                                        boolean exitForDownloadCanceled = false;
-                                        while (((bytesRead = connection.getInputStream().read(buffer, 0, buffer.length)) != -1)) {
-                                            fileWriter.write(buffer, 0, bytesRead);
-                                            receivedBytes += bytesRead;
-                                            Logger.log(bytesRead + " [" + receivedBytes + " / " + filesize + "]");
-                                            if (receivedBytes >= filesize) {
-                                                Logger.log("LAST OK");
-                                                RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.OK));
-                                                RawSerializer.receiveInt(connection.getInputStream());
-                                                break;
+                                        while (receivedBytes < filesize) {
+                                            int expectedBytes = RawSerializer.receiveInt(connection.getInputStream());
+                                            int bytesRead = connection.getInputStream().read(buffer, 0, expectedBytes);
+                                            if (expectedBytes != bytesRead) {
+                                                throw new IOException("Bytes mismatch: expected " + expectedBytes + ", received " + bytesRead);
                                             }
+                                            fileWriter.write(buffer, 0, bytesRead);
+                                            fileWriter.flush();
                                             if (downloadCanceled) {
-                                                Logger.log("DOWNLOAD CANCELED");
                                                 RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.DOWNLOAD_CANCELED));
-                                                exitForDownloadCanceled = true;
                                                 break;
                                             } else {
-                                                Logger.log("OK");
                                                 RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.OK));
-                                                RawSerializer.receiveInt(connection.getInputStream());
                                             }
                                         }
-                                        fileWriter.flush();
-                                        if (exitForDownloadCanceled) {
+                                        if (downloadCanceled) {
                                             fileWriter.close();
                                             //noinspection ResultOfMethodCallIgnored
                                             finalFile.delete();
+                                            Platform.runLater(() -> new InformationAlert("ANNULLAMENTO", "Download Annullato", "Il download e' stato annullato con successo."));
                                         } else {
                                             int completeDownload = RawSerializer.receiveInt(connection.getInputStream());
                                             if (SocketProtocol.DOWNLOAD_COMPLETE == SocketProtocol.getRequestByInt(completeDownload)) {
