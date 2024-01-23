@@ -117,18 +117,16 @@ public final class ControllerSceneReceiver {
                                     byte[] buffer = new byte[transferSpeed];
                                     try (FileOutputStream fileWriter = new FileOutputStream(finalFile)) {
                                         int bytesRead;
-                                        while ((bytesRead = connection.getInputStream().read(buffer)) != -1) {
+                                        while ((bytesRead = connection.getInputStream().read(buffer, 0, buffer.length)) != -1) {
                                             fileWriter.write(buffer, 0, bytesRead);
                                             receivedBytes += bytesRead;
                                             RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.OK));
-                                            if (receivedBytes == filesize) break;
+                                            if (receivedBytes >= filesize) break;
                                         }
                                         fileWriter.flush();
                                         int completeDownload = RawSerializer.receiveInt(connection.getInputStream());
                                         if (SocketProtocol.DOWNLOAD_COMPLETE == SocketProtocol.getRequestByInt(completeDownload)) {
                                             Platform.runLater(() -> new InformationAlert("SUCCESSO", "Download Completato", "Il download e' stato completato. Il file si trova in \"" + finalFile.getAbsolutePath() + "\""));
-                                        } else if (receivedBytes != filesize) {
-                                            throw new IOException("Download failed: bytes mismatch");
                                         } else {
                                             throw new IOException("Download failed: confirm not arrived");
                                         }
