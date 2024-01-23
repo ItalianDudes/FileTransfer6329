@@ -70,6 +70,7 @@ public class ClientHandler extends Thread {
                                     RawSerializer.sendInt(connection.getOutputStream(), SocketProtocol.getIntByRequest(SocketProtocol.DOWNLOADING));
                                     RawSerializer.sendInt(connection.getOutputStream(), ControllerSceneTransmitter.getTransferSpeed().getTransferSpeedBytes());
                                     RawSerializer.sendLong(connection.getOutputStream(), filesize);
+                                    connection.setSendBufferSize(ControllerSceneTransmitter.getTransferSpeed().getTransferSpeedBytes());
                                     byte[] buffer = new byte[ControllerSceneTransmitter.getTransferSpeed().getTransferSpeedBytes()];
                                     long bytesSent = 0;
                                     int bytesRead;
