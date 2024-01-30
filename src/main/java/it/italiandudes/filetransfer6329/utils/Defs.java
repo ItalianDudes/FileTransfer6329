@@ -11,9 +11,6 @@ import java.util.Objects;
 
 public final class Defs {
 
-    // App File Name
-    public static final String APP_FILE_NAME = "FileTransfer6329";
-
     // Jar App Position
     public static final String JAR_POSITION;
     static {
@@ -24,16 +21,6 @@ public final class Defs {
         }
     }
 
-    // JSON Element Key
-    public static final class ElementJSONKeys {
-        public static final String FILENAME = "filename";
-        public static final String ID = "id";
-        public static final String FILESIZE_KB = "filesize_kb";
-    }
-
-    // Byte Array Size
-    public static final int BYTE_ARRAY_MAX_SIZE = 65536; // ~64K DON'T CHANGE THIS, A SINGLE TCP PACKET CAN'T BE BIGGER THAN THIS
-
     // Max HTTPServer Backlog
     public static final int HTTPSERVER_BACKLOG = 10;
 
@@ -41,6 +28,7 @@ public final class Defs {
     public static final int HTTPSERVER_STOP_DELAY = 0;
 
     // Resources Location
+    @SuppressWarnings("unused")
     public static final class Resources {
 
         //Resource Getters
@@ -55,17 +43,6 @@ public final class Defs {
         public static final class JSON {
             public static final String JSON_CONFIGURATION = "configuration.json";
             public static final String DEFAULT_JSON_CONFIGURATION = "/json/" + JSON_CONFIGURATION;
-        }
-
-        // Images
-        public static final class Image {
-            private static final String IMAGE_DIR = "/image/";
-            public static final String IMAGE_DARK_MODE = IMAGE_DIR + "dark_mode.png";
-            public static final String IMAGE_LIGHT_MODE = IMAGE_DIR + "light_mode.png";
-            public static final String IMAGE_TICK = IMAGE_DIR + "tick.png";
-            public static final String IMAGE_CROSS = IMAGE_DIR + "cross.png";
-            public static final String IMAGE_ONLINE = IMAGE_DIR + "online.png";
-            public static final String IMAGE_OFFLINE = IMAGE_DIR + "offline.png";
         }
     }
 }

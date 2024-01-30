@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import java.io.*;
 import java.util.Scanner;
 
+@SuppressWarnings("unused")
 public final class JSONManager {
 
     // Attributes

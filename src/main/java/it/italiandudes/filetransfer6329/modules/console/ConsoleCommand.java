@@ -6,6 +6,7 @@ import it.italiandudes.filetransfer6329.modules.console.commands.StopConsoleComm
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("unused")
 public enum ConsoleCommand {
     HELP(new HelpConsoleCommand()),
     STOP(new StopConsoleCommand()),

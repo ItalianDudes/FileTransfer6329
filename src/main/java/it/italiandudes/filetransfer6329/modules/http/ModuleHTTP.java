@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 
+@SuppressWarnings("unused")
 public class ModuleHTTP extends BaseModule {
 
     // Attributes

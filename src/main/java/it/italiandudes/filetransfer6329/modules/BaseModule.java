@@ -8,6 +8,7 @@ import it.italiandudes.idl.common.Logger;
 import it.italiandudes.idl.common.StringHandler;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({"SameParameterValue", "unused"})
 public abstract class BaseModule {
 
     // Attributes
