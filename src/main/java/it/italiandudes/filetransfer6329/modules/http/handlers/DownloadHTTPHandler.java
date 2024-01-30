@@ -60,7 +60,7 @@ public class DownloadHTTPHandler implements HttpHandler {
                 exchange.getResponseHeaders().add("Content-Disposition", "attachment;filename=\"" + filename + "\"");
                 exchange.sendResponseHeaders(200, 0); // Chunked Mode
                 try (FileInputStream inputStream = new FileInputStream(resolvedFilePath)) {
-                    final byte[] buffer = new byte[ModuleHTTP.getInstance().getMaxDownloadSpeedKB()];
+                    final byte[] buffer = new byte[ModuleHTTP.getInstance().getMaxDownloadSpeedKB() * 1024];
                     int count;
                     while ((count = inputStream.read(buffer)) >= 0) {
                         Logger.log(exchange.getRemoteAddress().getHostName() + " --> " + resolvedFilePath.getAbsolutePath() + " [" + convertByteSecondToString(count) + "]");
