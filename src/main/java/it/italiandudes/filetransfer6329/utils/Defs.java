@@ -34,10 +34,11 @@ public final class Defs {
     // Byte Array Size
     public static final int BYTE_ARRAY_MAX_SIZE = 65536; // ~64K DON'T CHANGE THIS, A SINGLE TCP PACKET CAN'T BE BIGGER THAN THIS
 
-    // JSON Settings
-    public static final class SettingsKeys {
-        public static final String ENABLE_DARK_MODE = "enableDarkMode";
-    }
+    // Max HTTPServer Backlog
+    public static final int HTTPSERVER_BACKLOG = 10;
+
+    // HTTPServer Stop Delay
+    public static final int HTTPSERVER_STOP_DELAY = 0;
 
     // Resources Location
     public static final class Resources {
@@ -52,8 +53,8 @@ public final class Defs {
 
         // JSON
         public static final class JSON {
-            public static final String JSON_CLIENT_SETTINGS = "client_settings.json";
-            public static final String DEFAULT_JSON_CLIENT_SETTINGS = "/json/" + JSON_CLIENT_SETTINGS;
+            public static final String JSON_CONFIGURATION = "configuration.json";
+            public static final String DEFAULT_JSON_CONFIGURATION = "/json/" + JSON_CONFIGURATION;
         }
 
         // Images
