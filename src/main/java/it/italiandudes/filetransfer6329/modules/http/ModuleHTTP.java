@@ -35,7 +35,7 @@ public class ModuleHTTP extends BaseModule {
         moduleLoadPreliminaryCheck(MODULE_NAME, isReloading);
         if (!isReloading) setModuleState(ModuleState.LOADING);
 
-        port = (Integer) ModuleConfiguration.getInstance().getConfigValue(ConfigurationMap.Keys.SERVER_PORT);
+        port = (Integer) ModuleConfiguration.getInstance().getConfigValue(ConfigurationMap.Keys.PORT);
         if (port == null) {
             httpServer = null;
             rootDirectory = null;
@@ -43,7 +43,7 @@ public class ModuleHTTP extends BaseModule {
             setModuleState(ModuleState.NOT_LOADED);
             throw new ModuleException(MODULE_NAME + " Module Load: Canceled! (Reason: the port is null)");
         }
-        String rootDirectoryStr = (String) ModuleConfiguration.getInstance().getConfigValue(ConfigurationMap.Keys.SERVER_ROOT_DIRECTORY);
+        String rootDirectoryStr = (String) ModuleConfiguration.getInstance().getConfigValue(ConfigurationMap.Keys.ROOT_DIRECTORY);
         if (rootDirectoryStr == null) {
             httpServer = null;
             rootDirectory = null;
@@ -68,7 +68,7 @@ public class ModuleHTTP extends BaseModule {
             throw new ModuleError(MODULE_NAME + " Module Load: Failed! (Reason: can't create the server root directory)");
         }
 
-        maxDownloadSpeedKB = (Integer) ModuleConfiguration.getInstance().getConfigValue(ConfigurationMap.Keys.SERVER_DOWNLOAD_SPEED_KB);
+        maxDownloadSpeedKB = (Integer) ModuleConfiguration.getInstance().getConfigValue(ConfigurationMap.Keys.DOWNLOAD_SPEED_KB);
         if (maxDownloadSpeedKB == null || maxDownloadSpeedKB <= 0) {
             httpServer = null;
             rootDirectory = null;

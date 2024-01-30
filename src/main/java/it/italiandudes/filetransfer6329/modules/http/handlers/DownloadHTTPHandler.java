@@ -2,7 +2,10 @@ package it.italiandudes.filetransfer6329.modules.http.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import it.italiandudes.filetransfer6329.modules.configuration.ConfigurationMap;
+import it.italiandudes.filetransfer6329.modules.configuration.ModuleConfiguration;
 import it.italiandudes.filetransfer6329.modules.http.ModuleHTTP;
+import it.italiandudes.filetransfer6329.throwables.exceptions.module.configuration.ConfigurationModuleException;
 import it.italiandudes.idl.common.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,6 +20,9 @@ public class DownloadHTTPHandler implements HttpHandler {
     // Context
     public static final String CONTEXT = "/download";
 
+    // Attributes
+    private static Boolean logSendForDownload = null;
+
     // Methods
     private static String convertByteSecondToString(int speed) {
         if(speed <= 0) return "0B/s";
@@ -29,6 +35,13 @@ public class DownloadHTTPHandler implements HttpHandler {
     @Override
     public void handle(@NotNull final HttpExchange exchange) throws IOException {
         exchange.getResponseHeaders().set("Connection", "close");
+        if (logSendForDownload == null) {
+            try {
+                logSendForDownload = (Boolean) ModuleConfiguration.getInstance().getConfigValue(ConfigurationMap.Keys.LOG_SEND_FOR_DOWNLOAD);
+            } catch (ConfigurationModuleException e) {
+                logSendForDownload = false;
+            }
+        }
         String[] uriPath = exchange.getRequestURI().getPath().split("/");
         String filename;
         if (uriPath.length <= 2) {
@@ -63,7 +76,7 @@ public class DownloadHTTPHandler implements HttpHandler {
                     final byte[] buffer = new byte[ModuleHTTP.getInstance().getMaxDownloadSpeedKB() * 1024];
                     int count;
                     while ((count = inputStream.read(buffer)) >= 0) {
-                        Logger.log(exchange.getRemoteAddress().getHostName() + " --> " + resolvedFilePath.getAbsolutePath() + " [" + convertByteSecondToString(count) + "]");
+                        if (logSendForDownload) Logger.log(exchange.getRemoteAddress().getHostName() + " --> " + resolvedFilePath.getAbsolutePath() + " [" + convertByteSecondToString(count) + "]");
                         exchange.getResponseBody().write(buffer, 0, count);
                     }
                 } catch (FileNotFoundException e) {

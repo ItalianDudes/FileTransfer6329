@@ -69,21 +69,26 @@ public final class ModuleConfiguration extends BaseModule {
     // Module Methods
     private void validateAndFixConfiguration()throws ModuleException {
         try {
-            configuration.getInt(ConfigurationMap.Keys.SERVER_PORT);
+            configuration.getInt(ConfigurationMap.Keys.PORT);
         } catch (JSONException e) {
-            ConfigurationMap.fixEntry(configuration, ConfigurationMap.Keys.SERVER_PORT);
+            ConfigurationMap.fixEntry(configuration, ConfigurationMap.Keys.PORT);
         }
         try {
-            configuration.getString(ConfigurationMap.Keys.SERVER_ROOT_DIRECTORY);
+            configuration.getString(ConfigurationMap.Keys.ROOT_DIRECTORY);
         } catch (JSONException e) {
-            ConfigurationMap.fixEntry(configuration, ConfigurationMap.Keys.SERVER_ROOT_DIRECTORY);
+            ConfigurationMap.fixEntry(configuration, ConfigurationMap.Keys.ROOT_DIRECTORY);
         }
         try {
-            if (configuration.getInt(ConfigurationMap.Keys.SERVER_DOWNLOAD_SPEED_KB) <= 0) {
-                ConfigurationMap.fixEntry(configuration, ConfigurationMap.Keys.SERVER_DOWNLOAD_SPEED_KB);
+            if (configuration.getInt(ConfigurationMap.Keys.DOWNLOAD_SPEED_KB) <= 0) {
+                ConfigurationMap.fixEntry(configuration, ConfigurationMap.Keys.DOWNLOAD_SPEED_KB);
             }
         } catch (JSONException e) {
-            ConfigurationMap.fixEntry(configuration, ConfigurationMap.Keys.SERVER_DOWNLOAD_SPEED_KB);
+            ConfigurationMap.fixEntry(configuration, ConfigurationMap.Keys.DOWNLOAD_SPEED_KB);
+        }
+        try {
+            configuration.getBoolean(ConfigurationMap.Keys.LOG_SEND_FOR_DOWNLOAD);
+        } catch (JSONException e) {
+            ConfigurationMap.fixEntry(configuration, ConfigurationMap.Keys.LOG_SEND_FOR_DOWNLOAD);
         }
         try {
             JSONManager.writeJSON(configuration, new File(Defs.Resources.JSON.JSON_CONFIGURATION));

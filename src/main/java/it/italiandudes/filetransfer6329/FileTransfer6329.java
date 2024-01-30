@@ -37,7 +37,7 @@ public final class FileTransfer6329 {
         try {
             ModuleManager.init();
             Logger.log("Server Status: ONLINE");
-            Logger.log("Server Port: " + ModuleConfiguration.getInstance().getConfigValue(ConfigurationMap.Keys.SERVER_PORT));
+            Logger.log("Server Port: " + ModuleConfiguration.getInstance().getConfigValue(ConfigurationMap.Keys.PORT));
             Logger.log("Server Root Directory: " + ModuleHTTP.getInstance().getRootDirectory().getAbsolutePath());
             Logger.log("Type \"" + ConsoleCommand.HELP.getName() + "\" to see the list of all commands.");
         } catch (ModuleException | ModuleError e) {

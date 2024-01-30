@@ -1,5 +1,6 @@
 {
   "port": 80,
   "root_directory": "download/",
-  "server_max_download_speed_kb": 65536
+  "max_download_speed_kb": 65536,
+  "log_send_for_download": false
 }
