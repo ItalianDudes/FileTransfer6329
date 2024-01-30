@@ -49,14 +49,14 @@ public class ListHTTPHandler implements HttpHandler {
         exchange.getResponseHeaders().set("Connection", "close");
         File[] files = ModuleHTTP.getInstance().getRootDirectory().listFiles();
         StringBuilder builder = new StringBuilder();
+        String base = (listHTML==null?"<title>Server6329</title>\n<h1>FILE LIST</h1>":listHTML);
+        builder.append(base).append('\n');
         if (files == null || files.length == 0) {
-            builder.append("No file available.");
+            builder.append("<ul><li>No file available.</li></ul>");
         } else {
-            String base = (listHTML==null?"<title>Server6329</title>\n<h1>FILE LIST</h1>":listHTML);
-            builder.append(base).append('\n');
             builder.append("<ul>").append('\n');
             for (File file : files) {
-                builder.append("<li><b>[").append(convertByteToString(file.length())).append("]</b> <a href=\"").append("/download/").append(file.getName()).append("\">").append(file.getName()).append("</a></li>").append('\n');
+                builder.append("<li><span><a href=\"").append("/download/").append(file.getName()).append("\">").append(file.getName()).append("</a></span><b>[").append(convertByteToString(file.length())).append("]</b></li>").append('\n');
             }
             builder.append("</ul>");
         }
