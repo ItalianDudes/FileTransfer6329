@@ -1,4 +1,4 @@
-package it.italiandudes.bot6329.modules.console.commands;
+package it.italiandudes.filetransfer6329.server.modules.console.commands;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +32,9 @@ public abstract class BaseConsoleCommand {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof BaseConsoleCommand that)) return false;
+        if (!(o instanceof BaseConsoleCommand)) return false;
+
+        BaseConsoleCommand that = (BaseConsoleCommand) o;
 
         if (!getName().equals(that.getName())) return false;
         if (!getSynopsis().equals(that.getSynopsis())) return false;

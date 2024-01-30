@@ -1,9 +1,9 @@
-package it.italiandudes.bot6329.modules.console;
+package it.italiandudes.filetransfer6329.server.modules.console;
 
-import it.italiandudes.bot6329.modules.BaseModule;
-import it.italiandudes.bot6329.modules.ModuleState;
-import it.italiandudes.bot6329.throwables.errors.ModuleError;
-import it.italiandudes.bot6329.throwables.exceptions.ModuleException;
+import it.italiandudes.filetransfer6329.server.modules.BaseModule;
+import it.italiandudes.filetransfer6329.server.modules.ModuleState;
+import it.italiandudes.filetransfer6329.throwables.errors.ModuleError;
+import it.italiandudes.filetransfer6329.throwables.exceptions.ModuleException;
 import it.italiandudes.idl.common.Logger;
 import it.italiandudes.idl.common.StringHandler;
 import org.jetbrains.annotations.NotNull;

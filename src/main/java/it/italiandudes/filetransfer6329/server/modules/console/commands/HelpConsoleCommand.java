@@ -1,6 +1,6 @@
-package it.italiandudes.bot6329.modules.console.commands;
+package it.italiandudes.filetransfer6329.server.modules.console.commands;
 
-import it.italiandudes.bot6329.modules.console.ConsoleCommand;
+import it.italiandudes.filetransfer6329.server.modules.console.ConsoleCommand;
 import it.italiandudes.idl.common.Logger;
 import org.jetbrains.annotations.NotNull;
 

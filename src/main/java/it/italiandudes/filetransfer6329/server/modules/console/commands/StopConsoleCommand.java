@@ -1,7 +1,7 @@
-package it.italiandudes.bot6329.modules.console.commands;
+package it.italiandudes.filetransfer6329.server.modules.console.commands;
 
-import it.italiandudes.bot6329.modules.ModuleManager;
-import it.italiandudes.bot6329.throwables.exceptions.ModuleException;
+import it.italiandudes.filetransfer6329.server.modules.ModuleManager;
+import it.italiandudes.filetransfer6329.throwables.exceptions.ModuleException;
 import it.italiandudes.idl.common.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,10 +20,10 @@ public final class StopConsoleCommand extends BaseConsoleCommand {
     @Override
     public int execute(@NotNull String[] arguments) {
         try {
-            ModuleManager.shutdownBot();
+            ModuleManager.shutdown();
         } catch (ModuleException e) {
             Logger.log("An error has occurred during bot shutdown, emergency shutdown initiated");
-            ModuleManager.emergencyShutdownBot();
+            ModuleManager.emergencyShutdown();
         }
         return 0;
     }

@@ -1,6 +1,6 @@
-package it.italiandudes.bot6329.modules.console;
+package it.italiandudes.filetransfer6329.server.modules.console;
 
-import it.italiandudes.bot6329.throwables.exceptions.ModuleException;
+import it.italiandudes.filetransfer6329.throwables.exceptions.ModuleException;
 
 import java.util.Scanner;
 

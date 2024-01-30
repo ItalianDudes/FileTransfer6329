@@ -1,8 +1,8 @@
-package it.italiandudes.bot6329.modules.console;
+package it.italiandudes.filetransfer6329.server.modules.console;
 
-import it.italiandudes.bot6329.modules.console.commands.BaseConsoleCommand;
-import it.italiandudes.bot6329.modules.console.commands.HelpConsoleCommand;
-import it.italiandudes.bot6329.modules.console.commands.StopConsoleCommand;
+import it.italiandudes.filetransfer6329.server.modules.console.commands.BaseConsoleCommand;
+import it.italiandudes.filetransfer6329.server.modules.console.commands.HelpConsoleCommand;
+import it.italiandudes.filetransfer6329.server.modules.console.commands.StopConsoleCommand;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
