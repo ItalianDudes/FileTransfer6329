@@ -69,14 +69,14 @@ public class DownloadHTTPHandler implements HttpHandler {
                 }
             }
             if (found) {
-                Logger.log(exchange.getRemoteAddress().getHostName() + " --> " + resolvedFilePath.getAbsolutePath());
+                Logger.log(exchange.getRemoteAddress().getAddress().getHostAddress() + " --> " + resolvedFilePath.getAbsolutePath());
                 exchange.getResponseHeaders().add("Content-Disposition", "attachment;filename=\"" + filename + "\"");
                 exchange.sendResponseHeaders(200, 0); // Chunked Mode
                 try (FileInputStream inputStream = new FileInputStream(resolvedFilePath)) {
                     final byte[] buffer = new byte[ModuleHTTP.getInstance().getMaxDownloadSpeedKB() * 1024];
                     int count;
                     while ((count = inputStream.read(buffer)) >= 0) {
-                        if (logSendForDownload) Logger.log(exchange.getRemoteAddress().getHostName() + " --> " + resolvedFilePath.getAbsolutePath() + " [" + convertByteSecondToString(count) + "]");
+                        if (logSendForDownload) Logger.log(exchange.getRemoteAddress().getAddress().getHostAddress() + " --> " + resolvedFilePath.getAbsolutePath() + " [" + convertByteSecondToString(count) + "]");
                         exchange.getResponseBody().write(buffer, 0, count);
                     }
                 } catch (FileNotFoundException e) {
